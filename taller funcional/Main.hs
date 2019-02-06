@@ -35,18 +35,23 @@ consumir (AM ss f) q1 ys = foldl (\rec x -> concat ( map (\q -> f q x ) rec ) ) 
 
 -- Ejercicio 4
 acepta :: Eq a => MEN a b -> a -> [b] -> [a] -> Bool
-acepta = undefined
+acepta a1 q1 ys qs = estanTodos qs (consumir a1 q1 ys)
+
+estanTodos:: Eq a => [a] -> [a] -> Bool
+estanTodos [] _ = True
+estanTodos xs ys = foldr (\x z-> (elem x ys) && z) True xs
 
 lenguaje :: Eq a => MEN a b -> a ->  [a] -> [[b]]
-lenguaje = undefined
+lenguaje aut q0 qs = foldr (\s rec -> if acepta aut q0 s qs then s:rec else rec) [] (kleene (sigma aut))
 
 -- Sugerencia (opcional)
 kleene :: [b] -> [[b]]
-kleene = undefined
+kleene bs = [x | k<-[0..], x<-(foldNat [[]] (\r -> concat (map (\c -> map (\s -> c++[s]) bs ) r)) k)]
 
 -- Ejercicio 5
 trazas :: MEN a b -> a -> [[b]]
 trazas = undefined
+
 
 --Ejercicio 6
 
