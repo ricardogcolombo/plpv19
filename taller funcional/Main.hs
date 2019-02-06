@@ -30,7 +30,7 @@ completo (AM ss f) q1 = AM ss faux
 t4 = completo t2 'a'
 -- Ejercicio 3
 consumir :: Eq a => MEN a b -> a -> [b] -> [a]
-consumir (AM ss f) q1 ys = foldr (\x rec -> concat ( map (\q -> f q x ) rec ) ) [q1] (reverse ys)
+consumir (AM ss f) q1 ys = foldl (\rec x -> concat ( map (\q -> f q x ) rec ) ) [q1] ys
 
 
 -- Ejercicio 4
