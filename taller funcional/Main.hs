@@ -50,12 +50,15 @@ kleene bs = [x | k<-[0..], x<-(foldNat [[]] (\r -> concat (map (\c -> map (\s ->
 
 -- Ejercicio 5
 trazas ::  Eq a => MEN a b -> a -> [[b]]
-trazas aut q0 = filter (\t-> ((length $ consumir aut q0 t)>0 )) (todasLasTrazas aut)
+trazas aut q0 = foldr (\t rec-> if ((length $ consumir aut q0 t)>0) then ( take (length (consumir aut q0 t)) (repeat t))++rec else rec ) [] (todasLasTrazas aut q0)
 
 --Todas las trazas son cada tamaño de traza, de 0 al infinito
-todasLasTrazas ::Eq a => MEN a b -> [[b]]
-todasLasTrazas aut = [ x | k <-[0..], x <- trazasDeTamanio aut k]
+todasLasTrazas ::Eq a => MEN a b -> a-> [[b]]
+todasLasTrazas aut q0 =takeWhile (\traza -> existeUna aut q0 (trazasDeTamanio aut (toInteger(length traza)))) [ x | k <-[1..], x <- (trazasDeTamanio aut k)] 
 
+
+existeUna:: Eq a => MEN a b -> a ->[[b]]->Bool
+existeUna aut q0 futurasTrazas = foldr (\listaDeEstados rec-> (length listaDeEstados)>0 || rec) False (map (\traza -> consumir aut q0 traza) futurasTrazas)
 
 --Lista de trazas de tamaño k
 trazasDeTamanio :: Eq a =>MEN a b -> Integer -> [[b]]
