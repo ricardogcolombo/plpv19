@@ -18,18 +18,6 @@ foldNat :: a -> (a->a) -> Integer -> a
 foldNat caso0 casoSuc n | n == 0 = caso0
                         | n > 0 = casoSuc (foldNat caso0 casoSuc (n-1))
                         | otherwise = error "El argumento de foldNat no puede ser negativo"
-
-
-
-
-
 --todaslastrazas = map (\traza -> concat(map (\s -> traza++s) sigma )) trazas
-
-
-
-
 --filter (\nuevatraza -> length (consumir q0 nuevatraza) > 0 ) todaslastrazas
-
-
 --foldNat [] (\trazas -> filterlo ) k
-	

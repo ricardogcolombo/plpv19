@@ -49,9 +49,31 @@ kleene :: [b] -> [[b]]
 kleene bs = [x | k<-[0..], x<-(foldNat [[]] (\r -> concat (map (\c -> map (\s -> c++[s]) bs ) r)) k)]
 
 -- Ejercicio 5
-trazas :: MEN a b -> a -> [[b]]
-trazas = undefined
+trazas ::  Eq a => MEN a b -> a -> [[b]]
+trazas aut q0 = filter (\t-> ((length $ consumir aut q0 t)>0 )) (todasLasTrazas aut)
 
+--Todas las trazas son cada tamaño de traza, de 0 al infinito
+todasLasTrazas ::Eq a => MEN a b -> [[b]]
+todasLasTrazas aut = [ x | k <-[0..], x <- trazasDeTamanio aut k]
+
+
+--Lista de trazas de tamaño k
+trazasDeTamanio :: Eq a =>MEN a b -> Integer -> [[b]]
+trazasDeTamanio aut n = foldNat [[]] (\t -> agregarSimboloATrazas (sigma aut) t) n
+
+-------DE ACA PARA ABAJO FUNCIONA, ARREGLAR LAS FUNCIONES DE ARRIBA QUE NO TIPAN Y CREO QUE VA----
+
+--A cada traza de tamaño k, le agrego atras los simbolos del automata 
+-- agregarSimboloATrazas :: Eq a =>[b] -> [[b]] -> [[b]]
+agregarSimboloATrazas ss t = concat(map (\traza->  agregarSimbolos traza ss ) t)
+
+--agregarSimboloATrazas ['a','b'] ["ab", "ba"]
+-- >["aba","abb","baa","bab"]
+
+-- agregarSimbolos :: [b] -> [[b]] - >[[b]]
+agregarSimbolos traza ss = [traza++[ss!!i] | i <- [0..length(ss)-1]]
+--agregarSimbolos "ab" ['a','b']
+-- >["aba","abb"]
 
 --Ejercicio 6
 
