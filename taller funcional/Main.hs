@@ -56,7 +56,7 @@ trazas aut q0 = foldr (\t rec-> if ((length $ consumir aut q0 t)>0) then ( take 
 todasLasTrazas ::Eq a => MEN a b -> a-> [[b]]
 todasLasTrazas aut q0 =takeWhile (\traza -> existeUna aut q0 (trazasDeTamanio aut (toInteger(length traza)))) [ x | k <-[1..], x <- (trazasDeTamanio aut k)] 
 
-
+-- esta funcion revisa si alguna de todas las trazas de la lista cumple el consumir
 existeUna:: Eq a => MEN a b -> a ->[[b]]->Bool
 existeUna aut q0 futurasTrazas = foldr (\listaDeEstados rec-> (length listaDeEstados)>0 || rec) False (map (\traza -> consumir aut q0 traza) futurasTrazas)
 
@@ -64,16 +64,13 @@ existeUna aut q0 futurasTrazas = foldr (\listaDeEstados rec-> (length listaDeEst
 trazasDeTamanio :: Eq a =>MEN a b -> Integer -> [[b]]
 trazasDeTamanio aut n = foldNat [[]] (\t -> agregarSimboloATrazas (sigma aut) t) n
 
--------DE ACA PARA ABAJO FUNCIONA, ARREGLAR LAS FUNCIONES DE ARRIBA QUE NO TIPAN Y CREO QUE VA----
-
 --A cada traza de tamaño k, le agrego atras los simbolos del automata 
--- agregarSimboloATrazas :: Eq a =>[b] -> [[b]] -> [[b]]
+-- agregarSimboloATrazas :: [b] -> [b] -> [[b]]
 agregarSimboloATrazas ss t = concat(map (\traza->  agregarSimbolos traza ss ) t)
 
 --agregarSimboloATrazas ['a','b'] ["ab", "ba"]
 -- >["aba","abb","baa","bab"]
 
--- agregarSimbolos :: [b] -> [[b]] - >[[b]]
 agregarSimbolos traza ss = [traza++[ss!!i] | i <- [0..length(ss)-1]]
 --agregarSimbolos "ab" ['a','b']
 -- >["aba","abb"]
