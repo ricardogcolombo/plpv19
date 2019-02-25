@@ -15,6 +15,10 @@ Monomio.prototype.coefDeGrado = function(g) {
     return this.grado === g ? this.coeficiente : 0;
 }
 
+Monomio.prototype.toString = function() {
+    return this.coeficiente + (this.grado > 0? "X":"") + (this.grado>1? "^" + this.grado: "")
+}
+
 function Sumatoria(p1, p2) {
     this.izq = p1;
     this.der = p2;
@@ -75,19 +79,35 @@ Sumatoria.prototype.aPolinomio = function() {
             if (!m1) {
                 m1 = new Monomio(this.coefDeGrado(i), i);
             } else if (!m2) {
-            m2 = new Monomio(this.coefDeGrado(i), i);
+            m2 = new Monomio(this.coefDeGrado(i), i);   
             res = new Sumatoria(m2, m1)
-        } else {
+            res.__proto__ = Polinomio
+            } else {
             m = new Monomio(this.coefDeGrado(i), i);
             res = new Sumatoria(m, res)
+            res.__proto__ = Polinomio
         }
 
     }
+
     return res
 }
 
+const Polinomio = {}
 
+Polinomio.__proto__ = Sumatoria.prototype;
 
+Polinomio.aPolinomio = function(){
+    return this;
+} 
+
+Polinomio.toString = function(){
+    return this.izq.toString()+"+"+this.der.toString();
+}
+
+Polinomio.grado = function(){
+    return this.izq.grado
+}
 
 let s = new Monomio(7, 2);
 let s2 = new Monomio(8, 1);
@@ -96,3 +116,4 @@ let s4 = new Monomio(4, 0);
 let ss1 = new Sumatoria(s, s2)
 let ss2 = new Sumatoria(s3, s4)
 let ssF = new Sumatoria(ss1, ss2)
+ssP = ssF.aPolinomio()
