@@ -10,6 +10,8 @@
 
 paradasYLineas(C,N,L):- parada(C,N,L).
 
+paradasYLineas(C,N,L):- paradaEsquina(C,_,L).
+paradasYLineas(C,N,L):- paradaEsquina(_,C,L).
 
 % b. Dada una lista de líneas, todos los pares (calle, número) donde paran
 %    exactamente esas líneas.
@@ -39,16 +41,35 @@ tieneParada(C,N,X):- parada(C,N,L3), member(X,L3).
 
 
 % 5. Extender parada/3
-
+parada(C,N,LS):- esquina(C,N,C2,N2),paradaEsquina(C,C2,LS).
+parada(C,N,LS):- esquina(C2,N2,C,N),paradaEsquina(C2,C,LS).
 
 % 6. paradaCercana(+Calle, +Numero, +Distancia, ?Parada)
 
+enRango(M,N,D):- N-D =< M, M =< N+D.
+
+% sobre la misma cuadra dame todas las paradas
+paradaCercana(C, N, D, P) :-  P = parada(C,M,L),P, enRango(M,N,D).
+
+%en cada esquina recorrer la distancia que falta, devolve las paradas
+paradaCercana(C, N, D,P) :- esquina(C,N1,C2,N2), enRango(N1,N,D), P = parada(C2,M,L),P,D1 is D-(N1-N),enRango(M,N2,D1).
+paradaCercana(C, N, D,P) :- esquina(C2,N2,C,N1), enRango(N1,N,D), P = parada(C2,M,L),P,D1 is D-(N1-N),enRango(M,N2,D1).
+
 
 % 7. pasaPor(+Recorrido, ?Calle, ?Numero)
+pasaPor(LS,C,N):- member(V,LS), V = viaje(_,C,N, _,_).
+pasaPor(LS,C,N):- member(V,LS), V = viaje(_,_,_, C,N).
+pasaPor(LS,C,N):- member(V,LS), V = viaje(_,C,N1,C,N2),V,S1 is N1+1,S2 is N2-1, between(S1,S2,N).
 
 
 % 8. recorrido(+CalleOrig, +NumOrig, +CalleDest, +NumDest, +Dist,
 %              +CantTrasbordos, -Recorrido)
+
+
+recorrido(CO,NO,CD,ND,D,CT,R):- V= viaje(LI,CO,NO,CD,ND),V, parada(CO,NO,L),parada(CD,ND,L2),member(LI,L),member(LI,L2),R = [V].
+
+recorrido(CO,NO,CD,ND,D,CT,R):- paradaCercana(CO,NO,D,P),P = parada(C,N,L),parada(C,N,L),
+
 
 
 % ------------------------------------------------------------------------------
