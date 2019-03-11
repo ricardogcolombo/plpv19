@@ -1,4 +1,4 @@
-:- [paradas, esquinas].
+:- [paradas,esquinas].
 :- multifile parada/3.
 
 % ------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ tieneParada(C,X):- parada(C,_,L3), member(X,L3).
 
 
 % 4. b. lineasQueParan(+Calle, +Numero, -Lineas)
-lineasQuePara(C,N,LS) :- setof(X,tieneParada(C,N,X), LS).
+lineasQueParan(C,N,LS) :- setof(X,tieneParada(C,N,X), LS).
 
 tieneParada(C,N,X):- parada(C,N,L3), member(X,L3).
 
@@ -65,13 +65,86 @@ pasaPor(LS,C,N):- member(V,LS), V = viaje(_,C,N1,C,N2),V,S1 is N1+1,S2 is N2-1, 
 % 8. recorrido(+CalleOrig, +NumOrig, +CalleDest, +NumDest, +Dist,
 %              +CantTrasbordos, -Recorrido)
 
+%---------PENSADO EN LA CLASE-----------------------------------------------------------
 
-recorrido(CO,NO,CD,ND,D,CT,R):- V= viaje(LI,CO,NO,CD,ND),V, parada(CO,NO,L),parada(CD,ND,L2),member(LI,L),member(LI,L2),R = [V].
+%recorrido(CO,NO,CD,ND,D,CT,R):- V= viaje(LI,CO,NO,CD,ND),V, parada(CO,NO,L),parada(CD,ND,L2),member(LI,L),member(LI,L2),R = [V].
 
-recorrido(CO,NO,CD,ND,D,CT,R):- paradaCercana(CO,NO,D,P),P = parada(C,N,L),parada(C,N,L),
+%recorrido(CO,NO,CD,ND,D,CT,R):- paradaCercana(CO,NO,D,P),P = parada(C,N,L),parada(C,N,L),
 
+%---------------------------------------------------------------------------------------
 
+%Voy a generar todos los recorridos desde origen y destino y despues filtrar con lo que falta (generate and test)
 
+%recorrido(CO, NO, CD,ND,D,0,R):- [].
+%recorrido(CO,NO,CD,ND,D,CT,R):- todosLosRecorridos(CO,NO,CD,ND,D R), length(R,N), N =< CT, noPasaPorSiMismo.
+
+lineasDeParada(parada(C,N,LS),LS).
+calleDeParada(parada(C,_,_),C).
+numeroDeParada(parada(_,N,_),N).
+
+calleOrigenDeViaje(viaje(_,CO,_,_,_),CO).
+calleDestinoDeViaje(viaje(_,_,_,CD,_),CD).
+numeroOrigenDeViaje(viaje(_,_,NO,_,_),NO).
+numeroDestinoDeViaje(viaje(_,_,_,_,ND),ND).
+lineaDeViaje(viaje(L,_,_,_,_),L).
+
+%tomo un solo bondi, el viaje debe comenzar, terminar con misma linea, las direcciones (ORIGEN  - DESTINO)coincidir con las paradas cercanas de las direcciones
+
+todosLosRecorridos(CO,NO,CD,ND,D,[viaje(L,C,N,CF,NF)]):- 
+														paradaCercana(CO,NO,D,P), 
+														lineasDeParada(P,LS),
+														calleDeParada(P,C),
+														numeroDeParada(P,N),
+														member(L,LS), 
+														paradaCercana(CD,ND,D,PD),
+														calleDeParada(P,CF),
+														numeroDeParada(PD, NF),
+														lineasDeParada(PD,LSD), 
+														member(L,LSD).
+
+ 
+ 
+ %Tomo mas de uno, el primero debe ser mi ORIGEN.
+todosLosRecorridos(CO,NO,_,_,D,[viaje(L,C,N,CD2,ND2),V2|VS]):- 
+																paradaCercana(CO,NO,D,PO),
+																calleDeParada(PO,C),
+																numeroDeParada(PO,N),
+																lineasQueParan(C,N,LS),
+																member(L,LS),
+																tieneParada(CD2,ND2,L),
+																ND2\=N,
+																paradaCercana(CD2,ND2,D,P2),
+																calleDeParada(P2,C2),
+																numeroDeParada(P2,N2),
+																calleOrigenDeViaje(V2,C2),
+																numeroOrigenDeViaje(V2,N2),
+																lineasQueParan(C2,N2,LS2),
+																sinL(LS2,L,LS2),
+																member(L2,LS2),
+																lineaDeViaje(V2,L2),
+																todosLosRecorridos(CD2,ND2,CD,ND,D,[V2|VS]).
+
+paradaDeViaje(viaje(L,CO,NO,_,_),D,P):- paradaCercana(CO, NO,D,P), lineasDeParada(P,LS),member(L, LS).
+
+paradaCercanaDeViaje(viaje(_,CO,NO,_,_),D,P):- paradaCercana(CO, NO,D,P).
+
+sinL([],_,[]).
+sinL([L|LS],L, LSS):- sinL(LS,L,LSS).
+sinL([L1| XS ], L, [L1 | YS]) :- L \= L1,sinL(XS, L, YS).
+
+%----------------------------------------------------------------------------------------
+%CREO QUE NO VA A HACER FALTA ESTE, ADEMAS DE QUE LAS LISTAS ESCRITAS ASI NO TIPAN
+%tomo mas de uno, el ultimo es el destino.														
+%todosLosRecorridos(_,_,CD,ND,D,[VS|V1,(viaje(L,CO2,NO2,CD,ND))]):- 
+%																paradaDeViaje(V1,D,P1),
+%																calleDestino(V1,CO2),
+%																numeroDestino(V1, NO2), 
+%																paradaCercana(CO2,NO2,D,P),
+%																lineasDeParada(P,LS),
+%																member(L,LS),
+%																paradaCercana(CD,ND,PD),
+%																lineasDeParada(PD,LSD),
+%																member(L,LSD).
 % ------------------------------------------------------------------------------
 % Predicado auxiliar
 
